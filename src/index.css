@@ -1,0 +1,22 @@
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+:root {
+  --color-header: #ffffff;
+  --color-header-dark: #0f172a;
+  
+  --color-page: #f6f7f8;
+  --color-page-dark: #111821;
+}
+
+.dark {
+  --color-header: var(--color-header-dark);
+  --color-page: var(--color-page-dark);
+}
+#root {
+  width: 100%;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+}
