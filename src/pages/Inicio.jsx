@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { getPendingEncuestas, deletePendingEncuesta, countPendingEncuestas } from '../services/idb.service.js';
+import { getPendingEncuestas, deletePendingEncuesta, countPendingEncuestas, updateEncuestaStatus } from '../services/idb.service.js';
 import { encuestasService } from '../services/encuestas.service.js';
 import { apiFetch } from '../services/api.js';
 import Badge from '../components/ui/Badge';
@@ -50,9 +50,11 @@ export default function Inicio() {
             encuesta.archivos.forEach((file) => fd.append('evidencias', file));
           }
           await encuestasService.crearDocumento(fd);
+          await updateEncuestaStatus(encuesta.id, 'synced');
           await deletePendingEncuesta(encuesta.id);
           success++;
         } catch (_) {
+          await updateEncuestaStatus(encuesta.id, 'error');
           failed++;
         }
       }

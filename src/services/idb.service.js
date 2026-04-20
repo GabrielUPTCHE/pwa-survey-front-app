@@ -21,7 +21,7 @@ export async function saveEncuestaOffline(data) {
   return new Promise((resolve, reject) => {
     const tx = db.transaction([STORE_NAME], 'readwrite');
     const store = tx.objectStore(STORE_NAME);
-    const req = store.add(data);
+    const req = store.add({ ...data, status: 'pending' });
     req.onsuccess = () => resolve();
     req.onerror = (e) => reject(e.target.error);
   });
@@ -57,5 +57,22 @@ export async function countPendingEncuestas() {
     const req = store.count();
     req.onsuccess = (e) => resolve(e.target.result);
     req.onerror = (e) => reject(e.target.error);
+  });
+}
+
+export async function updateEncuestaStatus(id, status) {
+  const db = await openDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction([STORE_NAME], 'readwrite');
+    const store = tx.objectStore(STORE_NAME);
+    const getReq = store.get(id);
+    getReq.onsuccess = () => {
+      const record = getReq.result;
+      if (!record) { resolve(); return; }
+      const putReq = store.put({ ...record, status });
+      putReq.onsuccess = () => resolve();
+      putReq.onerror = (e) => reject(e.target.error);
+    };
+    getReq.onerror = (e) => reject(e.target.error);
   });
 }
