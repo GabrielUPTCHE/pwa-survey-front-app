@@ -70,7 +70,7 @@ export default defineConfig({
           
           // Caché para el resto de la API (GET requests como configuraciones o listas)
           {
-            urlPattern: /\/api\/.*/i,
+            urlPattern: ({ url, request }) => /\/api\/.*/i.test(url.pathname) && request.method === 'GET',
             handler: 'StaleWhileRevalidate',
             options: {
               cacheName: 'api-cache',
