@@ -70,7 +70,8 @@ export default defineConfig({
 
           // NetworkFirst para datos críticos: tipos-documento y sujetos
           {
-            urlPattern: ({ url }) => url.pathname.startsWith('/api/tipos-documento'),
+            urlPattern: ({ url, request }) =>
+              url.pathname.startsWith('/api/tipos-documento') && request.method === 'GET',
             handler: 'NetworkFirst',
             options: {
               cacheName: 'api-critical-cache',
@@ -85,7 +86,8 @@ export default defineConfig({
             },
           },
           {
-            urlPattern: ({ url }) => url.pathname.startsWith('/api/sujetos'),
+            urlPattern: ({ url, request }) =>
+              url.pathname.startsWith('/api/sujetos') && request.method === 'GET',
             handler: 'NetworkFirst',
             options: {
               cacheName: 'api-critical-cache',
