@@ -3,6 +3,9 @@ import { Outlet, NavLink, Link } from 'react-router-dom';
 
 export default function MainLayout() {
   const [isOnline, setIsOnline] = useState(navigator.onLine);
+  const [connectionType, setConnectionType] = useState(
+    navigator.connection?.effectiveType ?? null
+  );
 
   useEffect(() => {
     const handleOnline = () => setIsOnline(true);
@@ -11,11 +14,33 @@ export default function MainLayout() {
     window.addEventListener('online', handleOnline);
     window.addEventListener('offline', handleOffline);
 
+    const handleConnectionChange = () => {
+      setConnectionType(navigator.connection?.effectiveType ?? null);
+    };
+    navigator.connection?.addEventListener('change', handleConnectionChange);
+
     return () => {
       window.removeEventListener('online', handleOnline);
       window.removeEventListener('offline', handleOffline);
+      navigator.connection?.removeEventListener('change', handleConnectionChange);
     };
   }, []);
+
+  const getConnectionLabel = (type) => {
+    if (type === '4g') return '4G';
+    if (type === '3g') return '3G';
+    if (type === '2g') return '2G';
+    if (type === 'slow-2g') return 'Lento';
+    return null;
+  };
+
+  const getConnectionColor = (type) => {
+    if (type === '4g') return 'text-emerald-500';
+    if (type === '3g') return 'text-yellow-500';
+    if (type === '2g') return 'text-orange-500';
+    if (type === 'slow-2g') return 'text-rose-500';
+    return '';
+  };
 
   const getNavLinkClass = ({ isActive }) => 
     `flex flex-col items-center gap-1 transition-colors ${
@@ -38,14 +63,19 @@ export default function MainLayout() {
         </div>
         
         <div className={`flex items-center gap-2 px-3 py-1 rounded-full ${
-          isOnline 
-            ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400' 
+          isOnline
+            ? 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400'
             : 'bg-rose-100 dark:bg-rose-900/30 text-rose-700 dark:text-rose-400'
         }`}>
           <span className={`h-2 w-2 rounded-full animate-pulse ${isOnline ? 'bg-emerald-500' : 'bg-rose-500'}`}></span>
           <span className="text-xs font-bold uppercase tracking-wider">
             {isOnline ? 'En línea' : 'Sin conexión'}
           </span>
+          {isOnline && getConnectionLabel(connectionType) && (
+            <span className={`text-xs font-bold ${getConnectionColor(connectionType)}`}>
+              · {getConnectionLabel(connectionType)}
+            </span>
+          )}
         </div>
       </header>
 
