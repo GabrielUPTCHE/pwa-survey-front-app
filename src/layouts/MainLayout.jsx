@@ -1,6 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import { Outlet, NavLink, Link } from 'react-router-dom';
 
+function getConnectionLabel(type) {
+  if (type === '4g') return '4G';
+  if (type === '3g') return '3G';
+  if (type === '2g') return '2G';
+  if (type === 'slow-2g') return 'Lento';
+  return null;
+}
+
+function getConnectionColor(type) {
+  if (type === '4g') return 'text-emerald-500';
+  if (type === '3g') return 'text-yellow-500';
+  if (type === '2g') return 'text-orange-500';
+  if (type === 'slow-2g') return 'text-rose-500';
+  return '';
+}
+
 export default function MainLayout() {
   const [isOnline, setIsOnline] = useState(navigator.onLine);
   const [connectionType, setConnectionType] = useState(
@@ -26,21 +42,7 @@ export default function MainLayout() {
     };
   }, []);
 
-  const getConnectionLabel = (type) => {
-    if (type === '4g') return '4G';
-    if (type === '3g') return '3G';
-    if (type === '2g') return '2G';
-    if (type === 'slow-2g') return 'Lento';
-    return null;
-  };
-
-  const getConnectionColor = (type) => {
-    if (type === '4g') return 'text-emerald-500';
-    if (type === '3g') return 'text-yellow-500';
-    if (type === '2g') return 'text-orange-500';
-    if (type === 'slow-2g') return 'text-rose-500';
-    return '';
-  };
+  const connectionLabel = isOnline ? getConnectionLabel(connectionType) : null;
 
   const getNavLinkClass = ({ isActive }) => 
     `flex flex-col items-center gap-1 transition-colors ${
@@ -71,9 +73,9 @@ export default function MainLayout() {
           <span className="text-xs font-bold uppercase tracking-wider">
             {isOnline ? 'En línea' : 'Sin conexión'}
           </span>
-          {isOnline && getConnectionLabel(connectionType) && (
+          {connectionLabel && (
             <span className={`text-xs font-bold ${getConnectionColor(connectionType)}`}>
-              · {getConnectionLabel(connectionType)}
+              · {connectionLabel}
             </span>
           )}
         </div>
