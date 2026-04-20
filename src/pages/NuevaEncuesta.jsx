@@ -277,9 +277,9 @@ export default function NuevaEncuesta() {
           {/* Submit */}
           <div className="pt-6">
             <button
-              disabled={loading || geoStatus === 'pending'}
+              disabled={loading || geoStatus !== 'granted'}
               type="submit"
-              className={`w-full bg-primary hover:opacity-90 text-white font-bold py-4 rounded-xl shadow-lg shadow-primary/20 flex items-center justify-center gap-2 transition-transform active:scale-95 ${(loading || geoStatus === 'pending') ? 'opacity-50 cursor-not-allowed' : ''}`}
+              className={`w-full bg-primary hover:opacity-90 text-white font-bold py-4 rounded-xl shadow-lg shadow-primary/20 flex items-center justify-center gap-2 transition-transform active:scale-95 ${(loading || geoStatus !== 'granted') ? 'opacity-50 cursor-not-allowed' : ''}`}
             >
               {loading
                 ? <span className="material-symbols-outlined animate-spin">sync</span>
