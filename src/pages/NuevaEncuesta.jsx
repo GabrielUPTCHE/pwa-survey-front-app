@@ -47,6 +47,10 @@ export default function NuevaEncuesta() {
   }, []);
 
   useEffect(() => {
+    if (!navigator.geolocation) {
+      setGeoStatus('denied');
+      return;
+    }
     navigator.geolocation.getCurrentPosition(
       (pos) => {
         setGeoCoords({ lat: pos.coords.latitude, lng: pos.coords.longitude });
