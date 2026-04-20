@@ -56,7 +56,7 @@ export default function NuevaEncuesta() {
         setGeoCoords({ lat: pos.coords.latitude, lng: pos.coords.longitude });
         setGeoStatus('granted');
       },
-      () => setGeoStatus('denied'),
+      (err) => setGeoStatus(err.code === 1 ? 'denied' : 'error'),
       { enableHighAccuracy: true, timeout: 10000 }
     );
   }, []);
