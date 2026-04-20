@@ -115,6 +115,8 @@ export default function NuevaEncuesta() {
     fd.append('id_tipo_documento', idTipoDocumento);
     fd.append('id_acta', idActa);
     archivos.forEach((file) => fd.append('evidencias', file));
+    fd.append('latitud', geoCoords.lat);
+    fd.append('longitud', geoCoords.lng);
 
     try {
       await encuestasService.crearDocumento(fd);
@@ -130,6 +132,8 @@ export default function NuevaEncuesta() {
             archivos,
             sujeto_nombre: selectedSujeto.razon_social,
             fechaGuardado: new Date().toISOString(),
+            latitud: geoCoords.lat,
+            longitud: geoCoords.lng,
           });
           MySwal.fire({ icon: 'info', title: 'Guardado Offline', text: 'Sin conexión. La encuesta está segura en tu dispositivo y se sincronizará luego.', confirmButtonColor: '#3b82f6' });
           resetForm();
