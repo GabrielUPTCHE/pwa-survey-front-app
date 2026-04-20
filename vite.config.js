@@ -67,7 +67,38 @@ export default defineConfig({
           // NOTA: Se eliminó el bloque de BackgroundSync para '/api/nueva-encuesta'
           // porque ahora lo manejamos manualmente con IndexedDB en el componente
           // para poder soportar archivos adjuntos reales (FormData).
-          
+
+          // NetworkFirst para datos críticos: tipos-documento y sujetos
+          {
+            urlPattern: ({ url }) => url.pathname.startsWith('/api/tipos-documento'),
+            handler: 'NetworkFirst',
+            options: {
+              cacheName: 'api-critical-cache',
+              networkTimeoutSeconds: 5,
+              expiration: {
+                maxEntries: 20,
+                maxAgeSeconds: 60 * 60 * 24,
+              },
+              cacheableResponse: {
+                statuses: [0, 200],
+              },
+            },
+          },
+          {
+            urlPattern: ({ url }) => url.pathname.startsWith('/api/sujetos'),
+            handler: 'NetworkFirst',
+            options: {
+              cacheName: 'api-critical-cache',
+              networkTimeoutSeconds: 5,
+              expiration: {
+                maxEntries: 20,
+                maxAgeSeconds: 60 * 60 * 24,
+              },
+              cacheableResponse: {
+                statuses: [0, 200],
+              },
+            },
+          },
           // Caché para el resto de la API (GET requests como configuraciones o listas)
           {
             urlPattern: ({ url, request }) => /\/api\/.*/i.test(url.pathname) && request.method === 'GET',
