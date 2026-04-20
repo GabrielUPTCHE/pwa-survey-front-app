@@ -152,6 +152,27 @@ export default function NuevaEncuesta() {
       </header>
 
       <main className="flex-1 overflow-y-auto pb-8">
+        {/* Geo status chip */}
+        <div className="max-w-md mx-auto px-4 pt-3">
+          {geoStatus === 'pending' && (
+            <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800">
+              <span className="material-symbols-outlined animate-spin text-blue-500 text-sm">sync</span>
+              <p className="text-xs text-blue-700 dark:text-blue-400 font-medium">Obteniendo ubicación...</p>
+            </div>
+          )}
+          {geoStatus === 'granted' && (
+            <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800">
+              <span className="material-symbols-outlined text-emerald-500 text-sm">check_circle</span>
+              <p className="text-xs text-emerald-700 dark:text-emerald-400 font-medium">Ubicación lista</p>
+            </div>
+          )}
+          {(geoStatus === 'denied' || geoStatus === 'error') && (
+            <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-rose-50 dark:bg-rose-900/20 border border-rose-200 dark:border-rose-800">
+              <span className="material-symbols-outlined text-rose-500 text-sm">location_off</span>
+              <p className="text-xs text-rose-700 dark:text-rose-400 font-medium">Permiso de ubicación denegado. Actívalo en los ajustes del dispositivo.</p>
+            </div>
+          )}
+        </div>
         <form onSubmit={handleSubmit} className="max-w-md mx-auto p-4 space-y-6 mt-2">
 
           {/* Búsqueda de sujeto */}
