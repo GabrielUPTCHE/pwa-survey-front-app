@@ -89,6 +89,15 @@ export default function NuevaEncuesta() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (geoStatus !== 'granted') {
+      MySwal.fire({
+        icon: 'warning',
+        title: 'Ubicación requerida',
+        text: 'Activa el permiso de ubicación para poder enviar la encuesta.',
+        confirmButtonColor: '#3b82f6',
+      });
+      return;
+    }
     if (!selectedSujeto) {
       MySwal.fire({ icon: 'warning', title: 'Selecciona un sujeto', text: 'Busca y selecciona el establecimiento antes de continuar.', confirmButtonColor: '#3b82f6' });
       return;
@@ -268,9 +277,9 @@ export default function NuevaEncuesta() {
           {/* Submit */}
           <div className="pt-6">
             <button
-              disabled={loading}
+              disabled={loading || geoStatus === 'pending'}
               type="submit"
-              className={`w-full bg-primary hover:opacity-90 text-white font-bold py-4 rounded-xl shadow-lg shadow-primary/20 flex items-center justify-center gap-2 transition-transform active:scale-95 ${loading ? 'opacity-50 cursor-not-allowed' : ''}`}
+              className={`w-full bg-primary hover:opacity-90 text-white font-bold py-4 rounded-xl shadow-lg shadow-primary/20 flex items-center justify-center gap-2 transition-transform active:scale-95 ${(loading || geoStatus === 'pending') ? 'opacity-50 cursor-not-allowed' : ''}`}
             >
               {loading
                 ? <span className="material-symbols-outlined animate-spin">sync</span>
