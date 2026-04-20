@@ -36,10 +36,25 @@ export default function NuevaEncuesta() {
   // Archivos
   const [archivos, setArchivos] = useState([]);
 
+  // Geolocalización
+  const [geoCoords, setGeoCoords] = useState(null);
+  const [geoStatus, setGeoStatus] = useState('pending');
+
   useEffect(() => {
     encuestasService.getTiposDocumento()
       .then(setTiposDocumento)
       .catch(() => setTiposDocumento([]));
+  }, []);
+
+  useEffect(() => {
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        setGeoCoords({ lat: pos.coords.latitude, lng: pos.coords.longitude });
+        setGeoStatus('granted');
+      },
+      () => setGeoStatus('denied'),
+      { enableHighAccuracy: true, timeout: 10000 }
+    );
   }, []);
 
   useEffect(() => {
