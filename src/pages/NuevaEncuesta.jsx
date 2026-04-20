@@ -48,17 +48,23 @@ export default function NuevaEncuesta() {
 
   useEffect(() => {
     if (!navigator.geolocation) {
-      setGeoStatus('denied');
+      setGeoStatus('error');
       return;
     }
+    let cancelled = false;
     navigator.geolocation.getCurrentPosition(
       (pos) => {
+        if (cancelled) return;
         setGeoCoords({ lat: pos.coords.latitude, lng: pos.coords.longitude });
         setGeoStatus('granted');
       },
-      (err) => setGeoStatus(err.code === 1 ? 'denied' : 'error'),
+      (err) => {
+        if (cancelled) return;
+        setGeoStatus(err.code === 1 ? 'denied' : 'error');
+      },
       { enableHighAccuracy: true, timeout: 10000 }
     );
+    return () => { cancelled = true; };
   }, []);
 
   useEffect(() => {
@@ -179,10 +185,16 @@ export default function NuevaEncuesta() {
               <p className="text-xs text-emerald-700 dark:text-emerald-400 font-medium">Ubicación lista</p>
             </div>
           )}
-          {(geoStatus === 'denied' || geoStatus === 'error') && (
+          {geoStatus === 'denied' && (
             <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-rose-50 dark:bg-rose-900/20 border border-rose-200 dark:border-rose-800">
               <span className="material-symbols-outlined text-rose-500 text-sm">location_off</span>
               <p className="text-xs text-rose-700 dark:text-rose-400 font-medium">Permiso de ubicación denegado. Actívalo en los ajustes del dispositivo.</p>
+            </div>
+          )}
+          {geoStatus === 'error' && (
+            <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-rose-50 dark:bg-rose-900/20 border border-rose-200 dark:border-rose-800">
+              <span className="material-symbols-outlined text-rose-500 text-sm">location_off</span>
+              <p className="text-xs text-rose-700 dark:text-rose-400 font-medium">No se pudo obtener la ubicación. Verifica que el GPS esté activo.</p>
             </div>
           )}
         </div>
