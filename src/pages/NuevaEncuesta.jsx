@@ -93,6 +93,23 @@ export default function NuevaEncuesta() {
     setArchivos((prev) => prev.filter((_, i) => i !== index));
   };
 
+  const handleUploadClick = async () => {
+    const type = navigator.connection?.effectiveType;
+    if (type === 'slow-2g' || type === '2g') {
+      const result = await MySwal.fire({
+        icon: 'warning',
+        title: 'Conexión lenta detectada',
+        text: 'Subir archivos puede fallar o tardar mucho. ¿Continuar de todos modos?',
+        showCancelButton: true,
+        confirmButtonText: 'Sí, continuar',
+        cancelButtonText: 'Cancelar',
+        confirmButtonColor: '#3b82f6',
+      });
+      if (!result.isConfirmed) return;
+    }
+    fileInputRef.current.click();
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (geoStatus !== 'granted') {
@@ -259,7 +276,7 @@ export default function NuevaEncuesta() {
           <section className="space-y-4">
             <label className="text-sm font-semibold text-on-surface-variant dark:text-slate-300 ml-1">Subir Evidencias</label>
             <div
-              onClick={() => fileInputRef.current.click()}
+              onClick={handleUploadClick}
               className="border-2 border-dashed border-primary/30 rounded-2xl p-6 bg-primary/5 flex flex-col items-center justify-center gap-2 text-center cursor-pointer hover:bg-primary/10 transition-colors"
             >
               <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center text-primary mb-1">
