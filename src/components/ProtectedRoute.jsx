@@ -1,20 +1,23 @@
 import { Navigate, Outlet } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext'; // Usa tu hook de contexto
+import { useAuth } from '../context/AuthContext';
 
 export const ProtectedRoute = () => {
-    const { isAuthenticated, isLoading } = useAuth();
+  const { isAuthenticated, isLoading } = useAuth();
 
-    if (isLoading) {
-        // Muestra un cargador mientras verifica la sesión con el backend
-        return <div className="text-center p-10">Verificando sesión...</div>; 
-    }
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-surface dark:bg-surface-dark">
+        <div className="flex flex-col items-center gap-3 text-on-surface-variant dark:text-slate-400">
+          <span className="material-symbols-outlined animate-spin text-4xl text-primary">sync</span>
+          <p className="text-sm font-medium">Verificando sesión...</p>
+        </div>
+      </div>
+    );
+  }
 
-    // 🛑 Bloquea el acceso si no está autenticado
-    if (!isAuthenticated) {
-        // Redirige al login. El usuario NUNCA verá el layout principal sin login.
-        return <Navigate to="/login" replace />; 
-    }
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
 
-    // Permite el acceso al layout principal y sus páginas internas
-    return <Outlet />;
+  return <Outlet />;
 };
