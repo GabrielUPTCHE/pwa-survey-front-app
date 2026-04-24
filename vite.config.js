@@ -34,6 +34,7 @@ export default defineConfig({
       },
       workbox: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg}'],
+        navigateFallback: 'offline.html',
         runtimeCaching: [
           // Caché para fuentes de Google
           {

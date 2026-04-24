@@ -67,7 +67,7 @@ if (!self.define) {
     });
   };
 }
-define(['./workbox-6e14609e'], (function (workbox) { 'use strict';
+define(['./workbox-fa6cb374'], (function (workbox) { 'use strict';
 
   self.skipWaiting();
   workbox.clientsClaim();
@@ -78,8 +78,11 @@ define(['./workbox-6e14609e'], (function (workbox) { 'use strict';
    * See https://goo.gl/S9QRab
    */
   workbox.precacheAndRoute([{
+    "url": "registerSW.js",
+    "revision": "3ca0b8505b4bec776b69afdba2768812"
+  }, {
     "url": "index.html",
-    "revision": "0.b301gia3h"
+    "revision": "0.oh4lo1mjm8"
   }], {});
   workbox.cleanupOutdatedCaches();
   workbox.registerRoute(new workbox.NavigationRoute(workbox.createHandlerBoundToURL("index.html"), {
@@ -103,12 +106,10 @@ define(['./workbox-6e14609e'], (function (workbox) { 'use strict';
       statuses: [0, 200]
     })]
   }), 'GET');
-  workbox.registerRoute(/\/api\/nueva-encuesta/i, new workbox.NetworkOnly({
-    plugins: [new workbox.BackgroundSyncPlugin("sync-nueva-encuesta", {
-      maxRetentionTime: 1440
-    })]
-  }), 'POST');
-  workbox.registerRoute(/\/api\/.*/i, new workbox.StaleWhileRevalidate({
+  workbox.registerRoute(({
+    url,
+    request
+  }) => /\/api\/.*/i.test(url.pathname) && request.method === "GET", new workbox.StaleWhileRevalidate({
     "cacheName": "api-cache",
     plugins: [new workbox.ExpirationPlugin({
       maxEntries: 100,
