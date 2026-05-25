@@ -1,7 +1,9 @@
-const BASE_URL = import.meta.env.VITE_PATH;
+import { envoirments } from '../envoirments/envoirments';
+
+const BASE_URL = envoirments.apiUrl;
 
 if (!BASE_URL) {
-  throw new Error('[api] VITE_PATH is not defined. Check your .env file.');
+  throw new Error('[api] apiUrl is not defined. Check your envoirments file.');
 }
 
 export async function apiFetch(endpoint, options = {}) {
