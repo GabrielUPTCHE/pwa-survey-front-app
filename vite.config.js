@@ -34,7 +34,7 @@ export default defineConfig({
       },
       workbox: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg}'],
-        navigateFallback: 'offline.html',
+        navigateFallback: 'index.html',
         runtimeCaching: [
           // Caché para fuentes de Google
           {
@@ -129,7 +129,7 @@ export default defineConfig({
     port: 5173,
     proxy: {
       '/api': {
-        target: 'http://localhost:3000',
+        target: 'http://localhost:8081',
         changeOrigin: true,
         secure: false,
       }
