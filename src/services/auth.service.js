@@ -4,7 +4,7 @@ export const authService = {
   login: ({ numero_identificacion, contraseña }) =>
     apiFetch('/login', {
       method: 'POST',
-      body: JSON.stringify({ numero_identificacion, contraseña }),
+      body: JSON.stringify({ email: numero_identificacion, password: contraseña }),
     }),
 
   logout: () =>
