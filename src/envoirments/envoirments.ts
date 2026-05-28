@@ -1,3 +1,3 @@
 export const envoirments = {
-    apiUrl: 'https://heg2m63zj9.us-east-1.awsapprunner.com',
+    apiUrl: import.meta.env.VITE_API_URL || '/api',
 };

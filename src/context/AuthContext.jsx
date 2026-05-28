@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { authService } from "../services/auth.service.js";
 
 const AuthContext = createContext(null);
 
@@ -16,10 +17,7 @@ export const AuthProviderContent = ({ children, navigate }) => {
 
   const logout = async () => {
     try {
-      await fetch(import.meta.env.VITE_PATH + "/auth/logout", {
-        method: "POST",
-        credentials: "include",
-      });
+      await authService.logout();
     } catch (err) {
       console.error("Error cerrando sesión:", err);
     } finally {
@@ -33,31 +31,9 @@ export const AuthProviderContent = ({ children, navigate }) => {
     const checkAuth = async () => {
       setIsLoading(true);
       try {
-        const res = await fetch(import.meta.env.VITE_PATH + "/auth/verify", {
-          method: "GET",
-          credentials: "include",
-        });
+        const data = await authService.verify();
 
-        if (!res.ok) {
-          setIsAuthenticated(false);
-          setUser(null);
-          return;
-        }
-
-        // Verificar que la respuesta sea JSON antes de parsear
-        const contentType = res.headers.get("content-type");
-        if (!contentType?.includes("application/json")) {
-          console.warn("Respuesta no es JSON. Content-Type:", contentType);
-          const text = await res.text();
-          console.warn("Contenido:", text.substring(0, 200));
-          setIsAuthenticated(false);
-          setUser(null);
-          return;
-        }
-
-        const data = await res.json();
-
-        if (data.authenticated || data.valid) {
+        if (data?.authenticated || data?.valid) {
           setIsAuthenticated(true);
           setUser(data.user);
         } else {
@@ -65,7 +41,7 @@ export const AuthProviderContent = ({ children, navigate }) => {
           setUser(null);
         }
       } catch (error) {
-        console.error("Fallo la verificación de sesión:", error.message || error);
+        // 401 desde apiFetch lanza un error — sesión inválida o expirada
         setIsAuthenticated(false);
         setUser(null);
       } finally {
