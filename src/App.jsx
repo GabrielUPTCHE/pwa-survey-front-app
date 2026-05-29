@@ -21,13 +21,10 @@ export default function App() {
             <Route element={<MainLayout />}>
               <Route path="/" element={<HomePage />} />
               <Route path="/calendario" element={<Rutas />} />
+              <Route path="/configuracion" element={<Configuracion />} />
 
               <Route element={<RoleRoute allowedRoles={['supervisor', 'admin']} />}>
                 <Route path="/reportes" element={<Reportes />} />
-              </Route>
-
-              <Route element={<RoleRoute allowedRoles={['admin']} />}>
-                <Route path="/configuracion" element={<Configuracion />} />
               </Route>
             </Route>
 
