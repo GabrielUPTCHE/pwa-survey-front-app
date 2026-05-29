@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sin conexión — Encuestas</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', 'Public Sans', system-ui, sans-serif;
+      background: #f8fafc;
+      color: #1e293b;
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      gap: 0;
+    }
+
+    .card {
+      background: #fff;
+      border: 1px solid #e2e8f0;
+      border-radius: 1.25rem;
+      padding: 3rem 2.5rem;
+      max-width: 440px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 4px 24px 0 rgba(0,0,0,0.06);
+    }
+
+    .icon-wrap {
+      width: 72px;
+      height: 72px;
+      background: #eff6ff;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 1.5rem;
+    }
+
+    .icon-wrap svg {
+      width: 36px;
+      height: 36px;
+      color: #3b82f6;
+      stroke: #3b82f6;
+    }
+
+    h1 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #0f172a;
+      margin-bottom: 0.75rem;
+      letter-spacing: -0.01em;
+    }
+
+    p {
+      font-size: 0.95rem;
+      color: #64748b;
+      line-height: 1.6;
+      margin-bottom: 2rem;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: #3b82f6;
+      color: #fff;
+      font-size: 0.9rem;
+      font-weight: 600;
+      padding: 0.75rem 1.5rem;
+      border: none;
+      border-radius: 0.625rem;
+      cursor: pointer;
+      transition: background 0.15s, transform 0.1s;
+      text-decoration: none;
+    }
+
+    .btn:hover { background: #2563eb; transform: translateY(-1px); }
+    .btn:active { transform: translateY(0); }
+
+    .status {
+      margin-top: 1.5rem;
+      font-size: 0.8rem;
+      color: #94a3b8;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.4rem;
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #ef4444;
+      animation: pulse 2s infinite;
+    }
+
+    .dot.online { background: #22c55e; animation: none; }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+
+    .tips {
+      margin-top: 2rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid #f1f5f9;
+      text-align: left;
+    }
+
+    .tips h2 {
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: #94a3b8;
+      margin-bottom: 0.75rem;
+    }
+
+    .tips ul {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .tips li {
+      font-size: 0.85rem;
+      color: #64748b;
+      display: flex;
+      align-items: flex-start;
+      gap: 0.5rem;
+    }
+
+    .tips li::before {
+      content: "·";
+      color: #3b82f6;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="icon-wrap">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="1" y1="1" x2="23" y2="23"/>
+        <path d="M16.72 11.06A10.94 10.94 0 0 1 19 12.55"/>
+        <path d="M5 12.55a10.94 10.94 0 0 1 5.17-2.39"/>
+        <path d="M10.71 5.05A16 16 0 0 1 22.56 9"/>
+        <path d="M1.42 9a15.91 15.91 0 0 1 4.7-2.88"/>
+        <path d="M8.53 16.11a6 6 0 0 1 6.95 0"/>
+        <line x1="12" y1="20" x2="12.01" y2="20"/>
+      </svg>
+    </div>
+
+    <h1>Sin conexión</h1>
+    <p>
+      No hay acceso a internet en este momento. Puedes seguir usando la app:
+      las encuestas completadas offline se sincronizarán automáticamente cuando vuelva la conexión.
+    </p>
+
+    <button class="btn" onclick="retry()">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="1 4 1 10 7 10"/>
+        <path d="M3.51 15a9 9 0 1 0 .49-3.51"/>
+      </svg>
+      Reintentar
+    </button>
+
+    <div class="status">
+      <span class="dot" id="dot"></span>
+      <span id="status-text">Sin conexión</span>
+    </div>
+
+    <div class="tips">
+      <h2>Mientras tanto</h2>
+      <ul>
+        <li>Las encuestas guardadas offline están disponibles en la app.</li>
+        <li>Al recuperar conexión, los datos se sincronizarán solos.</li>
+        <li>Revisa tu red Wi-Fi o datos móviles.</li>
+      </ul>
+    </div>
+  </div>
+
+  <script>
+    function retry() {
+      if (navigator.onLine) {
+        window.location.href = '/';
+      } else {
+        window.location.reload();
+      }
+    }
+
+    function updateStatus() {
+      const dot = document.getElementById('dot');
+      const text = document.getElementById('status-text');
+      if (navigator.onLine) {
+        dot.classList.add('online');
+        text.textContent = 'Conexión restaurada — redirigiendo…';
+        setTimeout(() => { window.location.href = '/'; }, 1200);
+      } else {
+        dot.classList.remove('online');
+        text.textContent = 'Sin conexión';
+      }
+    }
+
+    // Si llega aquí estando online (e.g. deep link con SW activo), redirigir inmediato
+    if (navigator.onLine) {
+      window.location.replace('/');
+    }
+
+    window.addEventListener('online', updateStatus);
+    window.addEventListener('offline', updateStatus);
+  </script>
+</body>
+</html>
