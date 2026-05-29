@@ -46,6 +46,9 @@ export default function Inicio() {
           fd.append('id_sujeto', encuesta.id_sujeto);
           fd.append('id_tipo_documento', encuesta.id_tipo_documento);
           fd.append('id_acta', encuesta.id_acta);
+          if (encuesta.id_rutas) fd.append('id_rutas', encuesta.id_rutas);
+          if (encuesta.latitud != null) fd.append('latitud', encuesta.latitud);
+          if (encuesta.longitud != null) fd.append('longitud', encuesta.longitud);
           if (encuesta.archivos) {
             encuesta.archivos.forEach((file) => fd.append('evidencias', file));
           }

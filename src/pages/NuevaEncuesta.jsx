@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import withReactContent from 'sweetalert2-react-content';
 import { saveEncuestaOffline } from '../services/idb.service.js';
@@ -17,10 +17,24 @@ function useDebounce(value, delay) {
   return debounced;
 }
 
+const EMPTY_LOCAL = {
+  razon_social: '',
+  nit: '',
+  representacion_legal: '',
+  direccion_fisica: '',
+  barrio: '',
+  zona: '',
+};
+
 export default function NuevaEncuesta() {
   const navigate = useNavigate();
+  const location = useLocation();
   const fileInputRef = useRef(null);
   const [loading, setLoading] = useState(false);
+
+  // Ruta de visita de origen (cuando se entra desde "Iniciar Inspección")
+  const rutaId = location.state?.rutaId ?? null;
+  const presetSujeto = location.state?.sujeto ?? null;
 
   // Sujeto search
   const [sujetoQuery, setSujetoQuery] = useState('');
@@ -28,6 +42,20 @@ export default function NuevaEncuesta() {
   const [selectedSujeto, setSelectedSujeto] = useState(null);
   const [searchLoading, setSearchLoading] = useState(false);
   const debouncedQuery = useDebounce(sujetoQuery, 400);
+
+  // Registro de local nuevo
+  const [showRegister, setShowRegister] = useState(false);
+  const [newLocal, setNewLocal] = useState(EMPTY_LOCAL);
+  const [registering, setRegistering] = useState(false);
+
+  // Preselección del sujeto cuando se llega desde una ruta asignada
+  useEffect(() => {
+    if (presetSujeto?.id_sujeto) {
+      setSelectedSujeto(presetSujeto);
+      setSujetoQuery(presetSujeto.razon_social ?? '');
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Tipos de documento
   const [tiposDocumento, setTiposDocumento] = useState([]);
@@ -72,17 +100,50 @@ export default function NuevaEncuesta() {
       setSujetoResults([]);
       return;
     }
+    // No buscar si el query corresponde al sujeto ya seleccionado.
+    if (selectedSujeto && selectedSujeto.razon_social === debouncedQuery) {
+      setSujetoResults([]);
+      return;
+    }
     setSearchLoading(true);
     sujetosService.searchSujetos(debouncedQuery)
       .then(setSujetoResults)
       .catch(() => setSujetoResults([]))
       .finally(() => setSearchLoading(false));
-  }, [debouncedQuery]);
+  }, [debouncedQuery, selectedSujeto]);
 
   const selectSujeto = (sujeto) => {
     setSelectedSujeto(sujeto);
     setSujetoQuery(sujeto.razon_social);
     setSujetoResults([]);
+    setShowRegister(false);
+  };
+
+  const openRegister = () => {
+    setNewLocal({ ...EMPTY_LOCAL, razon_social: sujetoQuery });
+    setShowRegister(true);
+  };
+
+  const handleRegisterLocal = async (e) => {
+    e.preventDefault();
+    if (!newLocal.razon_social.trim()) {
+      MySwal.fire({ icon: 'warning', title: 'Razón social requerida', confirmButtonColor: '#3b82f6' });
+      return;
+    }
+    setRegistering(true);
+    try {
+      const creado = await sujetosService.createSujeto({
+        ...newLocal,
+        latitud: geoCoords?.lat ?? null,
+        longitud: geoCoords?.lng ?? null,
+      });
+      selectSujeto(creado);
+      MySwal.fire({ icon: 'success', title: 'Local registrado', text: 'Ahora puedes continuar con la encuesta.', confirmButtonColor: '#3b82f6' });
+    } catch (error) {
+      MySwal.fire({ icon: 'error', title: 'No se pudo registrar el local', text: error.message, confirmButtonColor: '#ef4444' });
+    } finally {
+      setRegistering(false);
+    }
   };
 
   const handleFileChange = (e) => {
@@ -137,6 +198,7 @@ export default function NuevaEncuesta() {
     fd.append('id_sujeto', selectedSujeto.id_sujeto);
     fd.append('id_tipo_documento', idTipoDocumento);
     fd.append('id_acta', idActa);
+    if (rutaId) fd.append('id_rutas', rutaId);
     archivos.forEach((file) => fd.append('evidencias', file));
     fd.append('latitud', geoCoords.lat);
     fd.append('longitud', geoCoords.lng);
@@ -152,6 +214,7 @@ export default function NuevaEncuesta() {
             id_sujeto: selectedSujeto.id_sujeto,
             id_tipo_documento: idTipoDocumento,
             id_acta: idActa,
+            id_rutas: rutaId,
             archivos,
             sujeto_nombre: selectedSujeto.razon_social,
             fechaGuardado: new Date().toISOString(),
@@ -250,6 +313,65 @@ export default function NuevaEncuesta() {
               <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800">
                 <span className="material-symbols-outlined text-emerald-500 text-sm">check_circle</span>
                 <p className="text-xs text-emerald-700 dark:text-emerald-400 font-medium">{selectedSujeto.razon_social}</p>
+              </div>
+            )}
+
+            {/* No registrado → registrar local nuevo */}
+            {!selectedSujeto && !searchLoading && debouncedQuery.length >= 2 && sujetoResults.length === 0 && !showRegister && (
+              <div className="flex flex-col gap-2 px-4 py-3 rounded-xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800">
+                <p className="text-xs text-amber-700 dark:text-amber-400 font-medium">
+                  Este local no está registrado.
+                </p>
+                <button
+                  type="button"
+                  onClick={openRegister}
+                  className="self-start text-xs font-bold text-primary flex items-center gap-1"
+                >
+                  <span className="material-symbols-outlined text-sm">add_business</span>
+                  Registrar local nuevo
+                </button>
+              </div>
+            )}
+
+            {showRegister && (
+              <div className="p-4 rounded-xl bg-surface-container dark:bg-slate-800 border border-primary/20 space-y-3">
+                <p className="text-sm font-bold text-on-surface dark:text-white">Registrar local</p>
+                {[
+                  { key: 'razon_social', label: 'Razón social *' },
+                  { key: 'nit', label: 'NIT' },
+                  { key: 'representacion_legal', label: 'Representante legal' },
+                  { key: 'direccion_fisica', label: 'Dirección física' },
+                  { key: 'barrio', label: 'Barrio' },
+                  { key: 'zona', label: 'Zona' },
+                ].map(({ key, label }) => (
+                  <input
+                    key={key}
+                    value={newLocal[key]}
+                    onChange={(e) => setNewLocal((p) => ({ ...p, [key]: e.target.value }))}
+                    placeholder={label}
+                    className="w-full h-11 px-3 rounded-lg border border-primary/20 bg-surface dark:bg-slate-900 text-sm text-on-surface dark:text-white focus:ring-2 focus:ring-primary outline-none"
+                  />
+                ))}
+                <div className="flex gap-2 pt-1">
+                  <button
+                    type="button"
+                    onClick={() => setShowRegister(false)}
+                    className="flex-1 py-2.5 rounded-lg border border-surface-container-highest dark:border-slate-700 text-sm font-medium text-on-surface-variant"
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleRegisterLocal}
+                    disabled={registering}
+                    className="flex-1 py-2.5 rounded-lg bg-primary text-white text-sm font-bold flex items-center justify-center gap-2 disabled:opacity-50"
+                  >
+                    {registering
+                      ? <span className="material-symbols-outlined animate-spin text-sm">sync</span>
+                      : <span className="material-symbols-outlined text-sm">save</span>}
+                    Guardar local
+                  </button>
+                </div>
               </div>
             )}
           </section>

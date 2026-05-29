@@ -1,7 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './context/AuthContext';
 import { ProtectedRoute } from './components/ProtectedRoute';
-import RoleRoute from './components/RoleRoute';
 import MainLayout from './layouts/MainLayout';
 import Login from './pages/Login';
 import HomePage from './pages/Inicio';
@@ -22,10 +21,7 @@ export default function App() {
               <Route path="/" element={<HomePage />} />
               <Route path="/calendario" element={<Rutas />} />
               <Route path="/configuracion" element={<Configuracion />} />
-
-              <Route element={<RoleRoute allowedRoles={['supervisor', 'admin']} />}>
-                <Route path="/reportes" element={<Reportes />} />
-              </Route>
+              <Route path="/reportes" element={<Reportes />} />
             </Route>
 
             <Route path="/nueva-encuesta" element={<NuevaEncuesta />} />

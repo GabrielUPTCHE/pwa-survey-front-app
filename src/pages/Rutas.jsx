@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { rutasService } from '../services/rutas.service.js';
 
 const DIAS = ['D', 'L', 'M', 'M', 'J', 'V', 'S'];
@@ -26,7 +27,17 @@ const borderStyle = {
 };
 
 export default function Rutas() {
+  const navigate = useNavigate();
   const today = new Date();
+
+  const iniciarInspeccion = (visita) => {
+    navigate('/nueva-encuesta', {
+      state: {
+        rutaId: visita.id_rutas,
+        sujeto: visita.sujeto,
+      },
+    });
+  };
   const [viewDate, setViewDate] = useState(new Date(today.getFullYear(), today.getMonth(), 1));
   const [selectedDate, setSelectedDate] = useState(today);
   const [expandedId, setExpandedId] = useState(null);
@@ -209,7 +220,10 @@ export default function Rutas() {
                             <p className="text-xs text-on-surface-variant dark:text-slate-400">{visita.sujeto?.zona} – {visita.sujeto?.barrio}</p>
                           </div>
                         </div>
-                        <button className="w-full mt-3 bg-primary text-white text-xs font-bold py-2.5 rounded-lg flex items-center justify-center gap-2 hover:bg-primary/90 transition-colors">
+                        <button
+                          onClick={(e) => { e.stopPropagation(); iniciarInspeccion(visita); }}
+                          className="w-full mt-3 bg-primary text-white text-xs font-bold py-2.5 rounded-lg flex items-center justify-center gap-2 hover:bg-primary/90 transition-colors"
+                        >
                           <span className="material-symbols-outlined text-sm">play_circle</span>
                           Iniciar Inspección
                         </button>
