@@ -17,22 +17,23 @@ export default function App() {
         <Routes>
           <Route path="/login" element={<Login />} />
 
-          <Route element={<ProtectedRoute />}>
+          {/* TEMP: ProtectedRoute desactivado para preview sin login */}
+          {/* <Route element={<ProtectedRoute />}> */}
             <Route element={<MainLayout />}>
               <Route path="/" element={<HomePage />} />
               <Route path="/calendario" element={<Rutas />} />
 
-              <Route element={<RoleRoute allowedRoles={['supervisor', 'admin']} />}>
+              {/* <Route element={<RoleRoute allowedRoles={['supervisor', 'admin']} />}> */}
                 <Route path="/reportes" element={<Reportes />} />
-              </Route>
+              {/* </Route> */}
 
-              <Route element={<RoleRoute allowedRoles={['admin']} />}>
+              {/* <Route element={<RoleRoute allowedRoles={['admin']} />}> */}
                 <Route path="/configuracion" element={<Configuracion />} />
-              </Route>
+              {/* </Route> */}
             </Route>
 
             <Route path="/nueva-encuesta" element={<NuevaEncuesta />} />
-          </Route>
+          {/* </Route> */}
         </Routes>
       </AuthProvider>
     </Router>
